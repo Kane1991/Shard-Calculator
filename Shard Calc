@@ -146,46 +146,42 @@ public class ShardProfitCalculatorGUI {
 
                     // Process shards based on shard rank and distribution
                     if (selectedRank.equals("Rank 1 Shard")) {
-                        // Rank 1 shards: Only Rank 1 Dust
                         rank1Dust += shardsToProcess * 3;
                     } else if (selectedRank.equals("Rank 2 Shard")) {
-                        // Rank 2 shards: 35% Rank 1 Dust, 65% Rank 2 Dust
                         for (int i = 0; i < shardsToProcess; i++) {
                             int dustType = random.nextInt(100);
-                            if (dustType < 35) {
-                                rank1Dust += 3; // 35% Rank 1 Dust
-                            } else {
-                                rank2Dust += 3; // 65% Rank 2 Dust
+                            if (dustType < 65) { // 65% Rank 1 Dust
+                                rank1Dust += 3;
+                            } else { // 35% Rank 2 Dust
+                                rank2Dust += 3;
                             }
                         }
                     } else if (selectedRank.equals("Rank 3 Shard")) {
-                        // Rank 3 shards: 37% Rank 1 Dust, 43% Rank 2 Dust, 20% Rank 3 Dust
                         for (int i = 0; i < shardsToProcess; i++) {
                             int dustType = random.nextInt(100);
                             if (dustType < 37) {
-                                rank1Dust += 3; // 37% Rank 1 Dust
+                                rank1Dust += 3;
                             } else if (dustType < 80) {
-                                rank2Dust += 3; // 43% Rank 2 Dust
+                                rank2Dust += 3;
                             } else {
-                                rank3Dust += 3; // 20% Rank 3 Dust
+                                rank3Dust += 3;
                             }
                         }
                     }
 
-                    // Apply resourcefulness: 17% chance to return a shard (recursive)
+                    // Apply resourcefulness
                     int extraShards = calculateExtraShards(shardsToProcess, RESOURCEFULNESS, random);
 
-                    // Process the extra shards for additional dust (but no additional cost)
+                    // Process the extra shards for additional dust
                     int totalShards = shardsToProcess + extraShards;
-
-                    // Calculate extra dust from the resourcefulness shards
                     int extraRank1Dust = 0, extraRank2Dust = 0, extraRank3Dust = 0;
+
                     for (int i = 0; i < extraShards; i++) {
                         int dustType = random.nextInt(100);
                         if (selectedRank.equals("Rank 1 Shard")) {
                             extraRank1Dust += 3;
                         } else if (selectedRank.equals("Rank 2 Shard")) {
-                            if (dustType < 35) {
+                            if (dustType < 65) {
                                 extraRank1Dust += 3;
                             } else {
                                 extraRank2Dust += 3;
@@ -207,42 +203,36 @@ public class ShardProfitCalculatorGUI {
 
                     // Calculate revenue and profit
                     double totalRevenue = (rank1Dust * rank1DustPrice) + (rank2Dust * rank2DustPrice) + (rank3Dust * rank3DustPrice);
-                    double totalShardCost = shardsToProcess * shardCost; // Only count the purchased shards
-                    double auctionCut = totalRevenue * 0.05; // 5% auction house cut
+                    double totalShardCost = shardsToProcess * shardCost;
+                    double auctionCut = totalRevenue * 0.05;
                     double netRevenue = totalRevenue - auctionCut;
                     double profit = netRevenue - totalShardCost;
 
-                    // Calculate processing time in minutes
-                    double timeToProcess = totalShards * PROCESSING_TIME_PER_SHARD / 60.0; // Convert to minutes
+                    // Calculate processing time
+                    double timeToProcess = totalShards * PROCESSING_TIME_PER_SHARD / 60.0;
 
                     // Output the results
                     String output = String.format(
                             "Total Shards Processed: %d\n" +
                                     "Rank 1 Dust: %d\nRank 2 Dust: %d\nRank 3 Dust: %d\n" +
                                     "Total Revenue: %.2f\nAuction House Cut: %.2f\n" +
-                                    "Net Revenue: %.2f\n" +
-                                    "Total Shard Cost: %.2f\nProfit: %.2f\n" +
-                                    "Time to Process: %.2f minutes",
-                            totalShards, rank1Dust, rank2Dust, rank3Dust,
-                            totalRevenue, auctionCut, netRevenue, totalShardCost, profit, timeToProcess);
+                                    "Net Revenue: %.2f\nShard Cost: %.2f\nProfit: %.2f\n" +
+                                    "Processing Time: %.2f minutes",
+                            totalShards, rank1Dust, rank2Dust, rank3Dust, totalRevenue, auctionCut, netRevenue, totalShardCost, profit, timeToProcess);
 
                     outputArea.setText(output);
+
                 } catch (NumberFormatException ex) {
-                    outputArea.setText("Please enter valid numeric values.");
+                    JOptionPane.showMessageDialog(frame, "Please enter valid numbers in all fields.", "Input Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
 
-            // Recursive method to calculate extra shards due to resourcefulness
-            private int calculateExtraShards(int originalShards, double resourcefulness, Random random) {
+            private int calculateExtraShards(int shardsToProcess, double resourcefulness, Random random) {
                 int extraShards = 0;
-                for (int i = 0; i < originalShards; i++) {
+                for (int i = 0; i < shardsToProcess; i++) {
                     if (random.nextDouble() < resourcefulness) {
                         extraShards++;
                     }
-                }
-                // If extra shards are generated, check for resourcefulness on the extra shards as well
-                if (extraShards > 0) {
-                    extraShards += calculateExtraShards(extraShards, resourcefulness, random);
                 }
                 return extraShards;
             }
