@@ -25,19 +25,19 @@ public class ShardProfitCalculatorGUI {
         gbc.insets = new Insets(10, 10, 10, 10); // Padding between components
 
         // Labels and Input Fields
-        JLabel shardCostLabel = new JLabel("Cost per Shard :");
+        JLabel shardCostLabel = new JLabel("Cost per Shard (gold):");
         shardCostLabel.setForeground(Color.WHITE);
         JTextField shardCostField = new JTextField(15);
 
-        JLabel rank1DustLabel = new JLabel("Sell Price of Rank 1 Dust :");
+        JLabel rank1DustLabel = new JLabel("Sell Price of Rank 1 Dust (gold):");
         rank1DustLabel.setForeground(Color.WHITE);
         JTextField rank1DustPriceField = new JTextField(15);
 
-        JLabel rank2DustLabel = new JLabel("Sell Price of Rank 2 Dust :");
+        JLabel rank2DustLabel = new JLabel("Sell Price of Rank 2 Dust (gold):");
         rank2DustLabel.setForeground(Color.WHITE);
         JTextField rank2DustPriceField = new JTextField(15);
 
-        JLabel rank3DustLabel = new JLabel("Sell Price of Rank 3 Dust :");
+        JLabel rank3DustLabel = new JLabel("Sell Price of Rank 3 Dust (gold):");
         rank3DustLabel.setForeground(Color.WHITE);
         JTextField rank3DustPriceField = new JTextField(15);
 
@@ -50,7 +50,7 @@ public class ShardProfitCalculatorGUI {
         selectShardRankLabel.setForeground(Color.WHITE);
 
         // Create dropdown for shard rank selection
-        String[] shardRanks = {"Rank 1", "Rank 2", "Rank 3"};
+        String[] shardRanks = {"Rank 1 Shard", "Rank 2 Shard", "Rank 3 Shard"};
         JComboBox<String> shardRankComboBox = new JComboBox<>(shardRanks);
 
         // Output area
@@ -65,7 +65,7 @@ public class ShardProfitCalculatorGUI {
         JScrollPane outputScrollPane = new JScrollPane(outputArea);
         outputScrollPane.setPreferredSize(new Dimension(400, 200));
 
-        // Calculate button
+        // Calculate button 
         JButton calculateButton = new JButton("Calculate");
         calculateButton.setPreferredSize(new Dimension(150, 40));
         calculateButton.setBackground(new Color(0, 123, 255));
