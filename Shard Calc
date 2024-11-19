@@ -1,0 +1,251 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Random;
+
+public class ShardProfitCalculatorGUI {
+    public static void main(String[] args) {
+        // Resourcefulness is a constant (17% chance to return a shard)
+        final double RESOURCEFULNESS = 0.17;
+        final double PROCESSING_TIME_PER_SHARD = 0.6; // 0.6 seconds per shard
+
+        // Create the frame
+        JFrame frame = new JFrame("Shard Profit Calculator");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(500, 650); // Make the window larger
+        frame.setLocationRelativeTo(null);  // Center the frame on the screen
+
+        // Create a panel for inputs with padding
+        JPanel panel = new JPanel();
+        panel.setLayout(new GridBagLayout());
+        panel.setBackground(new Color(30, 30, 30));  // Dark background for the panel
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10); // Padding between components
+
+        // Labels and Input Fields
+        JLabel shardCostLabel = new JLabel("Cost per Shard (gold):");
+        shardCostLabel.setForeground(Color.WHITE);
+        JTextField shardCostField = new JTextField(15);
+
+        JLabel rank1DustLabel = new JLabel("Sell Price of Rank 1 Dust (gold):");
+        rank1DustLabel.setForeground(Color.WHITE);
+        JTextField rank1DustPriceField = new JTextField(15);
+
+        JLabel rank2DustLabel = new JLabel("Sell Price of Rank 2 Dust (gold):");
+        rank2DustLabel.setForeground(Color.WHITE);
+        JTextField rank2DustPriceField = new JTextField(15);
+
+        JLabel rank3DustLabel = new JLabel("Sell Price of Rank 3 Dust (gold):");
+        rank3DustLabel.setForeground(Color.WHITE);
+        JTextField rank3DustPriceField = new JTextField(15);
+
+        JLabel shardsToProcessLabel = new JLabel("Number of Shards to Shatter:");
+        shardsToProcessLabel.setForeground(Color.WHITE);
+        JTextField shardsToProcessField = new JTextField(15);
+
+        // Add dropdown to select shard rank to process
+        JLabel selectShardRankLabel = new JLabel("Select Shard Rank to Process:");
+        selectShardRankLabel.setForeground(Color.WHITE);
+
+        // Create dropdown for shard rank selection
+        String[] shardRanks = {"Rank 1 Shard", "Rank 2 Shard", "Rank 3 Shard"};
+        JComboBox<String> shardRankComboBox = new JComboBox<>(shardRanks);
+
+        // Output area
+        JTextArea outputArea = new JTextArea(12, 30);
+        outputArea.setEditable(false);
+        outputArea.setLineWrap(true);
+        outputArea.setWrapStyleWord(true);
+        outputArea.setBackground(new Color(40, 40, 40));  // Dark background for output
+        outputArea.setForeground(Color.WHITE);
+        outputArea.setFont(new Font("Arial", Font.PLAIN, 12));
+
+        JScrollPane outputScrollPane = new JScrollPane(outputArea);
+        outputScrollPane.setPreferredSize(new Dimension(400, 200));
+
+        // Calculate button 
+        JButton calculateButton = new JButton("Calculate");
+        calculateButton.setPreferredSize(new Dimension(150, 40));
+        calculateButton.setBackground(new Color(0, 123, 255));
+        calculateButton.setForeground(Color.WHITE);
+        calculateButton.setFont(new Font("Arial", Font.BOLD, 14));
+
+        // Adding components to panel
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        panel.add(shardCostLabel, gbc);
+        gbc.gridx = 1;
+        panel.add(shardCostField, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        panel.add(rank1DustLabel, gbc);
+        gbc.gridx = 1;
+        panel.add(rank1DustPriceField, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        panel.add(rank2DustLabel, gbc);
+        gbc.gridx = 1;
+        panel.add(rank2DustPriceField, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        panel.add(rank3DustLabel, gbc);
+        gbc.gridx = 1;
+        panel.add(rank3DustPriceField, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        panel.add(shardsToProcessLabel, gbc);
+        gbc.gridx = 1;
+        panel.add(shardsToProcessField, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 5;
+        panel.add(selectShardRankLabel, gbc);
+        gbc.gridx = 1;
+        panel.add(shardRankComboBox, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 6;
+        gbc.gridwidth = 2;
+        panel.add(calculateButton, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 7;
+        gbc.gridwidth = 2;
+        panel.add(outputScrollPane, gbc);
+
+        // Add panel to the frame
+        frame.add(panel);
+        frame.setVisible(true);
+
+        // Calculate button action
+        calculateButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    // Parse inputs
+                    double shardCost = Double.parseDouble(shardCostField.getText());
+                    double rank1DustPrice = Double.parseDouble(rank1DustPriceField.getText());
+                    double rank2DustPrice = Double.parseDouble(rank2DustPriceField.getText());
+                    double rank3DustPrice = Double.parseDouble(rank3DustPriceField.getText());
+                    int shardsToProcess = shardsToProcessField.getText().isEmpty() ? 0 : Integer.parseInt(shardsToProcessField.getText());
+
+                    // Get selected shard rank
+                    String selectedRank = (String) shardRankComboBox.getSelectedItem();
+                    Random random = new Random();
+
+                    // Initialize dust counters
+                    int rank1Dust = 0;
+                    int rank2Dust = 0;
+                    int rank3Dust = 0;
+
+                    // Process shards based on shard rank and distribution
+                    if (selectedRank.equals("Rank 1 Shard")) {
+                        // Rank 1 shards: Only Rank 1 Dust
+                        rank1Dust += shardsToProcess * 3;
+                    } else if (selectedRank.equals("Rank 2 Shard")) {
+                        // Rank 2 shards: 35% Rank 1 Dust, 65% Rank 2 Dust
+                        for (int i = 0; i < shardsToProcess; i++) {
+                            int dustType = random.nextInt(100);
+                            if (dustType < 35) {
+                                rank1Dust += 3; // 35% Rank 1 Dust
+                            } else {
+                                rank2Dust += 3; // 65% Rank 2 Dust
+                            }
+                        }
+                    } else if (selectedRank.equals("Rank 3 Shard")) {
+                        // Rank 3 shards: 37% Rank 1 Dust, 43% Rank 2 Dust, 20% Rank 3 Dust
+                        for (int i = 0; i < shardsToProcess; i++) {
+                            int dustType = random.nextInt(100);
+                            if (dustType < 37) {
+                                rank1Dust += 3; // 37% Rank 1 Dust
+                            } else if (dustType < 80) {
+                                rank2Dust += 3; // 43% Rank 2 Dust
+                            } else {
+                                rank3Dust += 3; // 20% Rank 3 Dust
+                            }
+                        }
+                    }
+
+                    // Apply resourcefulness: 17% chance to return a shard (recursive)
+                    int extraShards = calculateExtraShards(shardsToProcess, RESOURCEFULNESS, random);
+
+                    // Process the extra shards for additional dust (but no additional cost)
+                    int totalShards = shardsToProcess + extraShards;
+
+                    // Calculate extra dust from the resourcefulness shards
+                    int extraRank1Dust = 0, extraRank2Dust = 0, extraRank3Dust = 0;
+                    for (int i = 0; i < extraShards; i++) {
+                        int dustType = random.nextInt(100);
+                        if (selectedRank.equals("Rank 1 Shard")) {
+                            extraRank1Dust += 3;
+                        } else if (selectedRank.equals("Rank 2 Shard")) {
+                            if (dustType < 35) {
+                                extraRank1Dust += 3;
+                            } else {
+                                extraRank2Dust += 3;
+                            }
+                        } else if (selectedRank.equals("Rank 3 Shard")) {
+                            if (dustType < 37) {
+                                extraRank1Dust += 3;
+                            } else if (dustType < 80) {
+                                extraRank2Dust += 3;
+                            } else {
+                                extraRank3Dust += 3;
+                            }
+                        }
+                    }
+
+                    rank1Dust += extraRank1Dust;
+                    rank2Dust += extraRank2Dust;
+                    rank3Dust += extraRank3Dust;
+
+                    // Calculate revenue and profit
+                    double totalRevenue = (rank1Dust * rank1DustPrice) + (rank2Dust * rank2DustPrice) + (rank3Dust * rank3DustPrice);
+                    double totalShardCost = shardsToProcess * shardCost; // Only count the purchased shards
+                    double auctionCut = totalRevenue * 0.05; // 5% auction house cut
+                    double netRevenue = totalRevenue - auctionCut;
+                    double profit = netRevenue - totalShardCost;
+
+                    // Calculate processing time in minutes
+                    double timeToProcess = totalShards * PROCESSING_TIME_PER_SHARD / 60.0; // Convert to minutes
+
+                    // Output the results
+                    String output = String.format(
+                            "Total Shards Processed: %d\n" +
+                                    "Rank 1 Dust: %d\nRank 2 Dust: %d\nRank 3 Dust: %d\n" +
+                                    "Total Revenue: %.2f\nAuction House Cut: %.2f\n" +
+                                    "Net Revenue: %.2f\n" +
+                                    "Total Shard Cost: %.2f\nProfit: %.2f\n" +
+                                    "Time to Process: %.2f minutes",
+                            totalShards, rank1Dust, rank2Dust, rank3Dust,
+                            totalRevenue, auctionCut, netRevenue, totalShardCost, profit, timeToProcess);
+
+                    outputArea.setText(output);
+                } catch (NumberFormatException ex) {
+                    outputArea.setText("Please enter valid numeric values.");
+                }
+            }
+
+            // Recursive method to calculate extra shards due to resourcefulness
+            private int calculateExtraShards(int originalShards, double resourcefulness, Random random) {
+                int extraShards = 0;
+                for (int i = 0; i < originalShards; i++) {
+                    if (random.nextDouble() < resourcefulness) {
+                        extraShards++;
+                    }
+                }
+                // If extra shards are generated, check for resourcefulness on the extra shards as well
+                if (extraShards > 0) {
+                    extraShards += calculateExtraShards(extraShards, resourcefulness, random);
+                }
+                return extraShards;
+            }
+        });
+    }
+}
